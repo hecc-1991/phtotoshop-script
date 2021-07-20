@@ -50,36 +50,45 @@
         var resourcePath = ''
 
         $("#btn_source_dir").click(function () {
-            
+
             log_info("")
 
             csInterface.evalScript('$.Exporter.openResourcePath()',
                 function (result) {
                     //alert(result)
-                    var data = JSON.parse(result)
-                    resourcePath = data.absoluteURI
-                    setSourcePath(data.fsName)
+                    var ret = JSON.parse(result)
+                    
+                    if (ret.stat != 0) {
+                        resourcePath = ""
+                        log_error(ret.info)
+                        
+                    } else {
+                        resourcePath = ret.data.absoluteURI
+                        setSourcePath(ret.data.fsName)
+                        log_info(ret.info)
+                    }
+
                 })
         })
 
 
         $("#btn_gen_config").click(function () {
-            
+
             log_info("")
 
             if (resourcePath == '') {
-                log_error("错误:请先设置图片资源文件目录")
+                log_error('错误:请先设置"原始素材路径"')
                 return
             }
             csInterface.evalScript('$.Exporter.exportConfig("' + resourcePath + '")',
-                function(result){
-                    var data = JSON.parse(result)
-                    if(data.stat != 0){
-                        log_error(data.info)
-                    }else{
-                        log_info(data.info)
+                function (result) {
+                    var ret = JSON.parse(result)
+                    if (ret.stat != 0) {
+                        log_error(ret.info)
+                    } else {
+                        log_info(ret.info)
                     }
-            })
+                })
         })
     }
 

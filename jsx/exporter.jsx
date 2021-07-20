@@ -3,23 +3,72 @@ if (typeof ($) == 'undefined')
 
 $.Exporter = (function (exports) {
 
+    function checkResource(files, filename) {
+        for (idx in files) {
+            var file = files[idx]
+            var pos = file.name.indexOf(filename + ".")
+            if (pos == 0) {
+                return file.name
+            }
+        }
+
+        return ""
+    }
+
+    function checkResources(srcDir) {
+
+        var files = srcDir.getFiles()
+
+        var layers = app.activeDocument.layers
+
+        for (var i = 0; i < layers.length; i++) {
+
+            var layer = layers[i]
+
+            var dstName = checkResource(files, layer.name)
+
+            if (dstName == "") {
+
+                var error_info = "错误:找不到图层<" + layer.name + ">的源文件,请检查路径是否正确"
+                var result = {
+                    stat: 1,
+                    info: error_info,
+                    data: {}
+                }
+
+                return result
+            }
+        }
+
+        var info = "图层源文件全部匹配"
+
+        var data = {
+            absoluteURI: srcDir.absoluteURI,
+            fsName: srcDir.fsName,
+            fullName: srcDir.fullName,
+            name: srcDir.name,
+            path: srcDir.path
+        }
+
+        var result = {
+            stat: 0,
+            info: info,
+            data: data
+        }
+
+        return result
+    }
+
     exports.openResourcePath = function () {
 
-        var srcdir = Folder.selectDialog()
+        var srcDir = Folder.selectDialog()
 
         //if(type(srcdir) == "File"){ 
         //}
 
-        var data = {
-            absoluteURI: srcdir.absoluteURI,
-            fsName: srcdir.fsName,
-            fullName: srcdir.fullName,
-            name: srcdir.name,
-            path: srcdir.path
+        var ret = checkResources(srcDir)
 
-        }
-
-        return JSON.stringify(data)
+        return JSON.stringify(ret)
     }
 
     function copyResource(files, filename, path) {
@@ -83,9 +132,9 @@ $.Exporter = (function (exports) {
 
             //var jsonFile = new File("config.json").saveDlg("", "Save As Type:*.json")
             var dstDir = Folder.selectDialog()
-            
+
             if (dstDir == null) {
-                var error_info = "错误:请设置配置文件目录"
+                var error_info = '错误:请设置"导出文件路径"'
                 var result = {
                     stat: 1,
                     info: error_info
@@ -93,7 +142,7 @@ $.Exporter = (function (exports) {
 
                 return JSON.stringify(result)
             }
-            
+
             var jsonFile = new File(dstDir.absoluteURI + "/config.json")
 
             var pPath = jsonFile.parent
@@ -109,8 +158,6 @@ $.Exporter = (function (exports) {
 
 
             var doc = app.activeDocument
-
-            var actLay = doc.activeLayer
 
             var layers = doc.layers
 
@@ -131,7 +178,7 @@ $.Exporter = (function (exports) {
                 var layer = layers[i]
 
                 var dstName = copyResource(files, layer.name, imgPath)
-
+                /*
                 if (dstName == "") {
                     var error_info = "错误:找不到图层<" + layer.name + ">的源文件,请检查目录是否正确"
                     var result = {
@@ -141,13 +188,14 @@ $.Exporter = (function (exports) {
 
                     return JSON.stringify(result)
                 }
+                */
 
                 var index = i + 1
                 var type = 1
                 var isfixed = i == layers.length - 1 ? true : false
                 var rotation = 0
                 var path = "image" + "/" + dstName
-                var padding = [0,0,0,0]
+                var padding = [0, 0, 0, 0]
 
                 var rect = bounds2Rect(layer.bounds)
                 var x = rect.x / bg_width
@@ -161,13 +209,13 @@ $.Exporter = (function (exports) {
                                 parseFloat(h.toFixed(6))]
 
                 var layInfo = {
-                    index:      index,
-                    type:       type,
-                    isFixed:    isfixed,
-                    rotation:   rotation,
-                    path:       path,
-                    rect:       recc_arr,
-                    padding:    padding
+                    index: index,
+                    type: type,
+                    isFixed: isfixed,
+                    rotation: rotation,
+                    path: path,
+                    rect: recc_arr,
+                    padding: padding
 
                 }
 
