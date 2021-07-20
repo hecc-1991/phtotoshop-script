@@ -78,13 +78,14 @@ $.Exporter = (function (exports) {
 
         try {
 
-            var dir = new Folder(resourcePath)
-            var files = dir.getFiles()
+            var srcDir = new Folder(resourcePath)
+            var files = srcDir.getFiles()
 
-            var jsonFile = File.saveDialog("", "Save As Type:*.json")
-
-            if (jsonFile == null) {
-                var error_info = "错误:请设置配置文件"
+            //var jsonFile = new File("config.json").saveDlg("", "Save As Type:*.json")
+            var dstDir = Folder.selectDialog()
+            
+            if (dstDir == null) {
+                var error_info = "错误:请设置配置文件目录"
                 var result = {
                     stat: 1,
                     info: error_info
@@ -92,14 +93,16 @@ $.Exporter = (function (exports) {
 
                 return JSON.stringify(result)
             }
+            
+            var jsonFile = new File(dstDir.absoluteURI + "/config.json")
 
             var pPath = jsonFile.parent
             var subPath = "image"
-            var dstPath = pPath + "/" + subPath
+            var imgPath = pPath + "/" + subPath
 
-            var dstDir = new Folder(dstPath)
-            if (!dstDir.exists) {
-                dstDir.create()
+            var imgDir = new Folder(imgPath)
+            if (!imgDir.exists) {
+                imgDir.create()
             }
 
             var config = {}
@@ -127,7 +130,7 @@ $.Exporter = (function (exports) {
 
                 var layer = layers[i]
 
-                var dstName = copyResource(files, layer.name, dstPath)
+                var dstName = copyResource(files, layer.name, imgPath)
 
                 if (dstName == "") {
                     var error_info = "错误:找不到图层<" + layer.name + ">的源文件,请检查目录是否正确"
@@ -144,6 +147,7 @@ $.Exporter = (function (exports) {
                 var isfixed = i == layers.length - 1 ? true : false
                 var rotation = 0
                 var path = "image" + "/" + dstName
+                var padding = [0,0,0,0]
 
                 var rect = bounds2Rect(layer.bounds)
                 var x = rect.x / bg_width
@@ -151,24 +155,21 @@ $.Exporter = (function (exports) {
                 var w = rect.w / bg_width
                 var h = rect.h / bg_height
 
-                var recc_arr = [x.toFixed(6),
-                                y.toFixed(6),
-                                w.toFixed(6),
-                                h.toFixed(6)]
+                var recc_arr = [parseFloat(x.toFixed(6)),
+                                parseFloat(y.toFixed(6)),
+                                parseFloat(w.toFixed(6)),
+                                parseFloat(h.toFixed(6))]
 
                 var layInfo = {
-                    index: index,
-                    type: type,
-                    isfixed: isfixed,
-                    rotation: rotation,
-                    name: layer.name,
-                    path: path,
-                    rect: recc_arr
+                    index:      index,
+                    type:       type,
+                    isFixed:    isfixed,
+                    rotation:   rotation,
+                    path:       path,
+                    rect:       recc_arr,
+                    padding:    padding
 
                 }
-
-                //var bounds = layer.bounds
-                //layInfo.rect = bounds2Rect(bounds)
 
                 layInfos.push(layInfo)
                 var jlayInfo = JSON.stringify(layInfo)
@@ -178,7 +179,7 @@ $.Exporter = (function (exports) {
             config['info'] = {
                 w: bg_width,
                 h: bg_height,
-                pitscount: layers.length - 1,
+                pitsCount: layers.length - 1,
                 name: doc.name
             }
 

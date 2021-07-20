@@ -42,10 +42,10 @@
 
     function init() {
 
-        themeManager.init();
+        themeManager.init()
 
-        var extensionRoot = csInterface.getSystemPath(SystemPath.EXTENSION) + "/jsx";
-        callExtendScript('$._ext.evalFiles', extensionRoot);
+        var extensionRoot = csInterface.getSystemPath(SystemPath.EXTENSION) + "/jsx"
+        callExtendScript('$._ext.evalFiles', extensionRoot)
 
         var resourcePath = ''
 
