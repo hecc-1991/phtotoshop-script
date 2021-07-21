@@ -118,7 +118,11 @@ $.Exporter = (function (exports) {
             x: bds[0],
             y: bds[1],
             w: bds[2] - bds[0],
-            h: bds[3] - bds[1]
+            h: bds[3] - bds[1],
+            l: bds[0],
+            t: bds[1],
+            r: bds[2],
+            b: bds[3]
         }
         return rect
     }
@@ -198,15 +202,15 @@ $.Exporter = (function (exports) {
                 var padding = [0, 0, 0, 0]
 
                 var rect = bounds2Rect(layer.bounds)
-                var x = rect.x / bg_width
-                var y = rect.y / bg_height
-                var w = rect.w / bg_width
-                var h = rect.h / bg_height
+                var l = rect.l / bg_width
+                var t = rect.t / bg_height
+                var r = rect.r / bg_width
+                var b = rect.b / bg_height
 
-                var recc_arr = [parseFloat(x.toFixed(6)),
-                                parseFloat(y.toFixed(6)),
-                                parseFloat(w.toFixed(6)),
-                                parseFloat(h.toFixed(6))]
+                var recc_arr = [parseFloat(l.toFixed(6)),
+                                parseFloat(t.toFixed(6)),
+                                parseFloat(r.toFixed(6)),
+                                parseFloat(b.toFixed(6))]
 
                 var layInfo = {
                     index: index,
