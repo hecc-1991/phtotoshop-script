@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
 
-    <link rel="stylesheet" href="css/topcoat-desktop-dark.min.css" />
-    <link id="hostStyle" rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+
 
     <title></title>
 </head>
@@ -14,12 +14,45 @@
 
     <div id="content">
 
-        <div>
-            <button id="btn_source_dir" class="topcoat-button--large hostFontSize">原始素材路径</button>
+        <div style="margin:10px 20px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn_reset" style="margin:10px 0px;">获取图层列表</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            图层名称
+                        </th>
+                        <th>
+                            是否可替换
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody id="tb_layers">
+                </tbody>
+            </table>
+
+        </div>
+
+
+        <div style="margin:0px 20px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn_source_dir" class="btn">原始素材路径</button>
             <p id="p_source_dir"></p>
         </div>
-        <div>
-            <button id="btn_gen_config" class="topcoat-button--large hostFontSize">导出文件路径</button>
+
+        <div style="margin:0px 20px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn_dst_dir" class="btn">导出文件路径</button>
+            <p id="p_dst_dir"></p>
+        </div>
+
+        <div style="margin:0px 20px;">
+            <button type="button" class="btn btn-secondary btn-sm" id="btn_gen_config" class="btn">生成</button>
+        </div>
+
+        <div id="div_log" style="margin:10px 20px;">
             <p id="p_log"></p>
         </div>
 

@@ -52,8 +52,8 @@
 					<Menu>涂图-拼图工具</Menu>
 					<Geometry>
 						<Size>
-							<Height>300</Height>
-							<Width>300</Width>
+							<Height>480</Height>
+							<Width>480</Width>
 						</Size>
                     <!--<MinSize>
                             <Height>550</Height>

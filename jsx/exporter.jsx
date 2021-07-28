@@ -59,18 +59,6 @@ $.Exporter = (function (exports) {
         return result
     }
 
-    exports.openResourcePath = function () {
-
-        var srcDir = Folder.selectDialog()
-
-        //if(type(srcdir) == "File"){ 
-        //}
-
-        var ret = checkResources(srcDir)
-
-        return JSON.stringify(ret)
-    }
-
     function copyResource(files, filename, path) {
         for (idx in files) {
             var file = files[idx]
@@ -82,6 +70,17 @@ $.Exporter = (function (exports) {
         }
 
         return ""
+    }
+
+    function checkfixed(layInfos, name) {
+        for (i in layInfos) {
+            var layer = layInfos[i]
+            if (layer.name == name) {
+                return layer.isFixed
+            }
+        }
+
+        return 1
     }
 
     function writeFile(fileObj, fileContent, encoding) {
@@ -127,25 +126,85 @@ $.Exporter = (function (exports) {
         return rect
     }
 
-    exports.exportConfig = function (resourcePath) {
+    exports.fetchDocInfo = function () {
+
+        var doc = app.activeDocument
+
+        var layers = doc.layers
+
+        var layInfos = []
+
+        for (var i = 0; i < layers.length; i++) {
+
+            var layer = layers[i]
+
+            layInfos.push(layer.name)
+
+        }
+
+        return JSON.stringify(layInfos)
+    }
+
+    exports.openResourcePath = function () {
+
+        var srcDir = Folder.selectDialog()
+        if (srcDir == null) {
+            var error_info = '错误:请设置"原始素材路径"'
+            var result = {
+                stat: 1,
+                info: error_info
+            }
+
+            return JSON.stringify(result)
+        }
+
+        var result = checkResources(srcDir)
+
+        return JSON.stringify(result)
+    }
+
+    exports.openDstPath = function () {
+
+        var dstDir = Folder.selectDialog()
+
+        if (dstDir == null) {
+            var error_info = '错误:请设置"导出文件路径"'
+            var result = {
+                stat: 1,
+                info: error_info
+            }
+
+            return JSON.stringify(result)
+        }
+
+
+        var info = '设置"导出文件路径"完成'
+
+        var data = {
+            absoluteURI: dstDir.absoluteURI,
+            fsName: dstDir.fsName,
+            fullName: dstDir.fullName,
+            name: dstDir.name,
+            path: dstDir.path
+        }
+        var result = {
+            stat: 0,
+            info: info,
+            data: data
+        }
+
+        return JSON.stringify(result)
+
+    }
+
+    exports.exportConfig = function (data) {
 
         try {
 
-            var srcDir = new Folder(resourcePath)
+            var srcDir = new Folder(data.resourcePath)
             var files = srcDir.getFiles()
 
-            //var jsonFile = new File("config.json").saveDlg("", "Save As Type:*.json")
-            var dstDir = Folder.selectDialog()
-
-            if (dstDir == null) {
-                var error_info = '错误:请设置"导出文件路径"'
-                var result = {
-                    stat: 1,
-                    info: error_info
-                }
-
-                return JSON.stringify(result)
-            }
+            var dstDir = new Folder(data.dstPath)
 
             var jsonFile = new File(dstDir.absoluteURI + "/config.json")
 
@@ -167,15 +226,8 @@ $.Exporter = (function (exports) {
 
             var layInfos = []
 
-            var bg_width = 0
-            var bg_height = 0
-
-            if (layers.length > 0) {
-                var last = layers[layers.length - 1]
-                var rect = bounds2Rect(last.bounds)
-                bg_width = rect.w
-                bg_height = rect.h
-            }
+            var bg_width = doc.width.as("px")
+            var bg_height =  doc.height.as("px")
 
             for (var i = 0; i < layers.length; i++) {
 
@@ -194,9 +246,9 @@ $.Exporter = (function (exports) {
                 }
                 */
 
-                var index = i + 1
+                var index = layers.length - i
                 var type = 1
-                var isfixed = i == layers.length - 1 ? true : false
+                var isfixed = checkfixed(data.layInfos, layer.name)
                 var rotation = 0
                 var path = "image" + "/" + dstName
                 var padding = [0, 0, 0, 0]
